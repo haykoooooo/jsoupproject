@@ -9,20 +9,38 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.haykabelyan.jsoupproject.MainActivity">
 
-    <TextView
-        android:id="@+id/textView1"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/button1"
-        android:text="Hello World!" />
+        android:layout_above="@+id/linearLayout"
+        android:text="Hello World!">
 
-    <Button
-        android:id="@+id/button1"
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:onClick="parsing"
-        android:text="Parse"
-        android:textAllCaps="false" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Parse"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Squad"
+            android:textAllCaps="false" />
+    </LinearLayout>
 </RelativeLayout>
