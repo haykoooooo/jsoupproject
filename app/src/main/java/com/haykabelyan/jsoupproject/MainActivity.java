@@ -67,10 +67,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected Void doInBackground(Void... params) {
             Document doc = null;//Здесь хранится будет разобранный html документ
             try {
-                //Считываем заглавную страницу http://harrix.org
-                doc = Jsoup.connect("https://en.wikipedia.org/wiki/F.C._Barcelona").get();
-                String temp = doc.html().replace("<tr class=\"vcard agent\">", "asdfghhgfdsa")
-                        .replace("</table>", "asdfghhgfdsa");
+                doc = Jsoup.connect("https://en.m.wikipedia.org/wiki/Juventus").
+                        userAgent("Opera/12.02 (Android 4.1; Linux; Opera Mobi/ADR-1111101157; U; en-US) Presto/2.9.201 Version/12.02").get();
+                String temp = doc.html().replace("<tr class=\"vcard agent\">", "asdfghhgfdsa").replace("</table>", "asdfghhgfdsa");
                 doc = Jsoup.parse(temp); //Parse again
             } catch (IOException e) {
                 //Если не получилось считать
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (doc != null) {
                 title = doc.title();
 //                body = doc.text();
-                body = doc.body().text().replace("asdfghhgfdsa", "\n").toString();
+                body = doc.body().text().replace("asdfghhgfdsa", "\n");
                 squadPlayers = new ArrayList<>(99);
                 if (body.contains("No. Position Player"))
                     hasSquad = true;
@@ -106,6 +105,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         numberOfPlayers++;
                         squadPlayers.add(new FootballPlayer(i + "", "FW", "f"));
                     }
+                }
+                if (squadPlayers.size() > 0)
+                    for (int i = 0; i < squadPlayers.size() - 1; i++) {
+                        String playerName = body.substring((4 + (Integer.parseInt(squadPlayers.get(i).getNumber()) < 10 ? 1 : 2))
+                                        + body.indexOf(" " + squadPlayers.get(i).getNumber() + " " + squadPlayers.get(i).getPosition()),
+                                nearestNewLineIndex(body, " " + squadPlayers.get(i).getNumber()
+                                        + " " + squadPlayers.get(i).getPosition())).trim();
+                        if (playerName.contains("(") && playerName.contains(")") &&
+                                playerName.indexOf("(") < playerName.indexOf(")"))
+                            playerName = playerName.
+                                    replace(playerName.substring(playerName.indexOf("("), playerName.indexOf(")") + 1), "");
+                        if (playerName.contains("[") && playerName.contains("]") &&
+                                playerName.indexOf("[") < playerName.indexOf("]"))
+                            playerName = playerName.
+                                    replace(playerName.substring(playerName.indexOf("["), playerName.indexOf("]") + 1), "");
+                        squadPlayers.get(i).setFullName(playerName);
+                    }
+                if (squadPlayers.size() > 1) {
+                    String playerName = body.substring((4 + (Integer.parseInt(squadPlayers.get(squadPlayers.size() - 1)
+                                    .getNumber()) < 10 ? 1 : 2)) + body.indexOf(" " + squadPlayers.get(squadPlayers.size() - 1)
+                                    .getNumber() + " " + squadPlayers.get(squadPlayers.size() - 1).getPosition()),
+                            nearestNewLineIndex(body, " " + squadPlayers.get(squadPlayers.size() - 1).getNumber() +
+                                    " " + squadPlayers.get(squadPlayers.size() - 1).getPosition())).trim();
+                    if (playerName.contains("(") && playerName.contains(")") &&
+                            playerName.indexOf("(") < playerName.indexOf(")"))
+                        playerName = playerName.
+                                replace(playerName.substring(playerName.indexOf("("), playerName.indexOf(")") + 1), "");
+                    if (playerName.contains("[") && playerName.contains("]") &&
+                            playerName.indexOf("[") < playerName.indexOf("]"))
+                        playerName = playerName.
+                                replace(playerName.substring(playerName.indexOf("["), playerName.indexOf("]") + 1), "");
+                    squadPlayers.get(squadPlayers.size() - 1).setFullName(playerName);
                 }
             } else {
                 title = "Error";
@@ -144,5 +175,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             //Тут выводим итоговые данные
         }
+    }
+
+    public int nearestNewLineIndex(String string, String subString) {
+        int newLinesAfterSubstring = 0;
+        int index = 0;
+        if (!string.contains("\n") || !string.contains(subString))
+            return 0;
+        else
+            for (int i = string.indexOf(subString); i < string.length(); i++)
+                if (string.charAt(i) == '\n') {
+                    newLinesAfterSubstring++;
+                    index = i;
+                    i = string.length();
+                }
+        if (newLinesAfterSubstring == 0)
+            return 0;
+        else return index;
     }
 }
